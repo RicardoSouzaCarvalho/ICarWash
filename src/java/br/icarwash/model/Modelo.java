@@ -8,7 +8,17 @@ public class Modelo {
     private PorteVeiculo porte;
 
     public enum PorteVeiculo {
-        PEQUENO, MEDIO, GRANDE;
+        PEQUENO(1), MEDIO(1.05), GRANDE(1.1);
+
+        private final double taxa;
+
+        PorteVeiculo(double taxa) {
+            this.taxa = taxa;
+        }
+
+        public double getTaxa() {
+            return taxa;
+        }
     }
 
     public Modelo(ModeloBuilder builder) {

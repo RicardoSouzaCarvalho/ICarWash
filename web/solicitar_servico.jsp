@@ -6,7 +6,7 @@
 
 <div class="container">    
     <div class="row">
-        <h4>Solicitar Serviço</h4>
+        <p class="titulo-controle">Solicitar Serviço</p>
         <div class="divider"></div>
     </div>
 
@@ -41,21 +41,12 @@
                 <label>Modelo</label>
             </div>
         </div>
-        <%--<div class="row">
-            <h5 class="erro-porte col s12">Porte do Veículo</h5>
-            <p class="col s4">
-                <input class="with-gap" name="porte" type="radio" id="pequeno" value="pequeno"/>
-                <label for="pequeno">Pequeno</label>
-            </p>
-            <p class="col s4">
-                <input class="with-gap" name="porte" type="radio" id="medio" value="medio"/>
-                <label for="medio">Médio</label>
-            </p>
-            <p class="col s4">
-                <input class="with-gap" name="porte" type="radio" id="grande" value="grande"/>
-                <label for="grande">Grande</label>
-            </p>
-        </div>--%>
+
+        <div class="col s2">
+            
+               Tamanho: <span id="porte"></span><a class="tooltipped" data-position="right" data-delay="50" data-tooltip="Os preços finais dos serviços podem variar de acordo com o tamanho do veículo." style="cursor:help"><i class="material-icons">info_outline</i>
+            </a>
+        </div>
         <div class="row col s6">
             <h5 class="erro-servico col s12">Serviços</h5>
             <c:forEach var="servico" items="${servicos}">
@@ -63,6 +54,7 @@
                     <p class="col s6">
                         <input type="checkbox" name="servico" id="${servico.id}" value="${servico.id}"/>
                         <label for="${servico.id}">${servico.nome}</label>
+                        ${servico.valor}
                     </p>  
                 </c:if>
             </c:forEach> 

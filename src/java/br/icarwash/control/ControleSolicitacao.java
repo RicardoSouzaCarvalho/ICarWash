@@ -114,6 +114,12 @@ public class ControleSolicitacao extends HttpServlet {
         Connection conexao = (Connection) request.getAttribute("conexao");
         String[] IdServicosSolicitados = request.getParameterValues("servico");
 
+        Modelo modelo = new ModeloBuilder()
+                .withId(Integer.parseInt(request.getParameter("modelo")))
+                .build();
+
+        modelo = new ModeloDAO(conexao).localizarPorId(modelo);
+
         Servico servico;
         ServicoDAO servicoDAO = new ServicoDAO(conexao);
         double valor = 0;
@@ -125,6 +131,9 @@ public class ControleSolicitacao extends HttpServlet {
             servico = servicoDAO.localizarPorId(servico);
             valor += servico.getValor().doubleValue();
         }
+        
+        valor *= modelo.getPorte().getTaxa();
+
         BigDecimal valorTotal = new BigDecimal(valor);
         return valorTotal;
 

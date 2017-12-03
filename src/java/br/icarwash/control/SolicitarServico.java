@@ -46,6 +46,8 @@ public class SolicitarServico extends HttpServlet {
 
         request.setAttribute("servicos", new ServicoDAO(conexao).listar());
         request.setAttribute("enderecos", enderecos);
+        request.setAttribute("taxaMedio", 1.05);
+        request.setAttribute("taxaGrande", 1.10);
 
         RequestDispatcher rd = request.getRequestDispatcher("/solicitar_servico.jsp");
         rd.forward(request, response);

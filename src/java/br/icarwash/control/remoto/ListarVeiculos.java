@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "ListarVeiculos", urlPatterns = {"/listar-marcas", "/listar-modelos"})
+@WebServlet(name = "ListarVeiculos", urlPatterns = {"/listar-marcas", "/listar-modelos", "/consultar-porte"})
 public class ListarVeiculos extends HttpServlet {
 
     /**
@@ -58,6 +58,16 @@ public class ListarVeiculos extends HttpServlet {
             
             Gson gson = new Gson();
             String listaJSON = gson.toJson(new ModeloDAO(Conexao.getConexao()).listarPorIdMarca(modelo));
+            out.println(listaJSON);
+
+        } else if (URI.endsWith("/consultar-porte")) {
+
+            Modelo modelo = new ModeloBuilder()
+                    .withId(Integer.parseInt(request.getParameter("modelo")))
+                    .build();
+            
+            Gson gson = new Gson();
+            String listaJSON = gson.toJson(new ModeloDAO(Conexao.getConexao()).localizarPorId(modelo));
             out.println(listaJSON);
 
         }

@@ -34,10 +34,15 @@ public class SolicitacaoDAO {
     private static final String SELECT_BY_ID_CLIENTE = "SELECT * FROM solicitacao where id_cliente = ? order by data_solicitacao";
     private static final String SELECT_BY_ID_LAVADOR = "select * FROM solicitacao where id_lavador = ? order by data_solicitacao";
     private static final String SELECT_SOLICITACAO_HOJE_LAVADOR = "select * from solicitacao where id_lavador = ? and DATE(DATE_FORMAT(data_solicitacao, '%Y-%m-%d')) = CURDATE()";
-    private static final String SELECT_EM_ANALISE = "SELECT * FROM solicitacao where solicitacao.status = 'Em Analise'";
+    private static final String SELECT_EM_ANALISE = "SELECT * FROM solicitacao where status = 'Em Analise'";
+    private static final String SELECT_AVALIADO = "SELECT * FROM solicitacao where status = 'Avaliado'";
     private static final String SELECT_HORARIO_INDISPONIVEL = "SELECT data_solicitacao as hora, STATUS, count(*) as quantidade FROM solicitacao where  (status like 'Em Analise' or status like 'Agendado') and data_solicitacao like ? group by hora having quantidade >= ?";
     private static final String SELECT_QTD_SOLICITACAO_BY_IDLAVADOR_AND_DATE = "select count(*) as quantidade FROM solicitacao where id_lavador = ? and status <> 'Cancelado' and data_solicitacao like ?";
     private static final String SELECT_CHECK_LAVADORES_DISPONIVEIS = "select * FROM solicitacao where id_lavador = ? and data_solicitacao = ? and status <> 'Cancelado' and status <> 'Avaliado'";
+    private static final String SELECT_AGENDADO = "SELECT * FROM solicitacao where status = 'Agendado'";
+    private static final String SELECT_FINALIZADO = "SELECT * FROM solicitacao where status = 'Finalizado'";
+    private static final String SELECT_EM_PROCESSO = "SELECT * FROM solicitacao where status = 'Em Processo'";
+    private static final String SELECT_CANCELADO = "SELECT * FROM solicitacao where status = 'Cancelado'";
 
     private static final String CANCELA = "UPDATE solicitacao SET status = 'Cancelado' WHERE ID = ?";
     private static final String AGENDA = "UPDATE solicitacao SET status = 'Agendado' WHERE ID = ?";
@@ -181,7 +186,7 @@ public class SolicitacaoDAO {
         SolicitacaoState solicitacaoState;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_SOLICITACAO_HOJE_LAVADOR);
-            pstmt.setInt(1,solicitacao.getLavador().getId());
+            pstmt.setInt(1, solicitacao.getLavador().getId());
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -332,6 +337,47 @@ public class SolicitacaoDAO {
                         .withModelo(new ModeloBuilder().withId(rs.getInt("id_modelo")).build())
                         .withDataSolicitacao(data)
                         .withValorTotal(rs.getBigDecimal("valor_total"))
+                        .build();
+
+                solicitacoes.add(solicitacao);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return solicitacoes;
+    }
+
+    public ArrayList<Solicitacao> listarAvaliado() {
+        ArrayList<Solicitacao> solicitacoes = new ArrayList();
+        Solicitacao solicitacao;
+        Cliente cliente;
+        Lavador lavador;
+        SolicitacaoState solicitacaoState;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_AVALIADO);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                cliente = new ClienteBuilder()
+                        .withId(rs.getInt("id_cliente"))
+                        .build();
+
+                lavador = new LavadorBuilder()
+                        .withId(rs.getInt("id_lavador"))
+                        .build();
+
+                solicitacaoState = validarStatus(rs.getString("status"));
+                Calendar data = Calendar.getInstance();
+                data.setTime(rs.getTimestamp("data_solicitacao"));
+
+                solicitacao = new SolicitacaoBuilder()
+                        .withId(rs.getInt("ID"))
+                        .withCliente(cliente)
+                        .withLavador(lavador)
+                        .withSolicitacaoState(solicitacaoState)
+                        .withModelo(new ModeloBuilder().withId(rs.getInt("id_modelo")).build())
+                        .withDataSolicitacao(data)
+                        .withValorTotal(rs.getBigDecimal("valor_total"))
+                        .withAvaliacao(new AvaliacaoBuilder().withId(rs.getInt("id_avaliacao")).build())
                         .build();
 
                 solicitacoes.add(solicitacao);
@@ -533,6 +579,139 @@ public class SolicitacaoDAO {
                 throw new UnsupportedOperationException("Solicitação sem Status");
         }
         return solicitacaoState;
+    }
+
+    public Integer quantidadeEmAnalise() {
+
+        Integer quantidadeEmAnalise = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_EM_ANALISE);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeEmAnalise = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeEmAnalise;
+    }
+
+    public Integer quantidadeAvaliado() {
+
+        Integer quantidadeAvaliado = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_AVALIADO);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeAvaliado = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeAvaliado;
+    }
+
+    public Integer quantidadeCancelado() {
+
+        Integer quantidadeCancelado = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_CANCELADO);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeCancelado = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeCancelado;
+    }
+
+    public Integer quantidadeEmProcesso() {
+
+        Integer quantidadeEmProcesso = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_EM_PROCESSO);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeEmProcesso = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeEmProcesso;
+    }
+
+    public Integer quantidadeFinalizado() {
+
+        Integer quantidadeFinalizado = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_FINALIZADO);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeFinalizado = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeFinalizado;
+    }
+
+    public Integer quantidadeAgendado() {
+
+        Integer quantidadeAgendado = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_AGENDADO);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeAgendado = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeAgendado;
+    }
+
+    public Integer quantidadeSolicitacoes() {
+
+        Integer quantidadeSolicitacoes = 0;
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(SELECT_ALL);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.last()) {
+                quantidadeSolicitacoes = rs.getRow();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return quantidadeSolicitacoes;
     }
 
 }

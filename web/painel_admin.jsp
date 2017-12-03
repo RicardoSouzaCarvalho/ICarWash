@@ -9,7 +9,16 @@
 </div>
 
 <div class="row">
-    <div class="col s12">
+    <ul class="collection with-header col s12 m6">
+        <li class="collection-header"><p class="titulo-controle2" style="text-align: left;">Quantidade de Solicitacoes <a class="secondary-content">${qtdPorStatusSolicitacao.get("totalSolicitacao")}- 100%</a></p></li>
+        <li class="collection-item"><div>Agendado<a class="secondary-content">${qtdPorStatusSolicitacao.get("agendado")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits="2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('agendado')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+        <li class="collection-item"><div>Avaliado<a class="secondary-content">${qtdPorStatusSolicitacao.get("avaliado")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits = "2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('avaliado')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+        <li class="collection-item"><div>Cancelado<a class="secondary-content">${qtdPorStatusSolicitacao.get("cancelado")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits = "2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('cancelado')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+        <li class="collection-item"><div>EmAnalise<a class="secondary-content">${qtdPorStatusSolicitacao.get("emAnalise")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits = "2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('emAnalise')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+        <li class="collection-item"><div>Finalizado<a class="secondary-content">${qtdPorStatusSolicitacao.get("finalizado")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits = "2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('finalizado')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+        <li class="collection-item"><div>EmProcesso<a class="secondary-content">${qtdPorStatusSolicitacao.get("emProcesso")} ㅤㅤㅤㅤㅤㅤ <fmt:formatNumber minIntegerDigits = "2" minFractionDigits="0" maxFractionDigits="0" value="${(qtdPorStatusSolicitacao.get('emProcesso')*100)/qtdPorStatusSolicitacao.get('totalSolicitacao')}"/>%</a></div></li>
+    </ul>
+    <div class="col s6 s12 m6">
         <table class="responsive-table centered striped">
             <thead>
             <p class="titulo-controle2">Ranking de Lavador - Média de avaliações</p>
@@ -30,7 +39,7 @@
                 <tr>
                     <td>#2</td>
                     <td>Mafalda</td>
-                    <td>4.86</td>
+                    <td>4.91</td>
                 </tr>
                 <tr>
                     <td>#3</td>
@@ -77,7 +86,7 @@
 <script src="js/carregar-pie.js"></script>
 <script src="js/carregar-line.js"></script>
 <script>
-     window.onload = function () {
+    window.onload = function () {
         var ctx = document.getElementById("canvas").getContext("2d");
         window.myLine = new Chart(ctx, config_line);
 
