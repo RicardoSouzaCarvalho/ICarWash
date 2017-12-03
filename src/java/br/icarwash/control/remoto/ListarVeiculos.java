@@ -3,7 +3,9 @@ package br.icarwash.control.remoto;
 import br.icarwash.dao.MarcaDAO;
 import br.icarwash.dao.ModeloDAO;
 import br.icarwash.model.Marca;
+import br.icarwash.model.Marca.MarcaBuilder;
 import br.icarwash.model.Modelo;
+import br.icarwash.model.Modelo.ModeloBuilder;
 import br.icarwash.util.Conexao;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -46,10 +48,16 @@ public class ListarVeiculos extends HttpServlet {
 
         } else if (URI.endsWith("/listar-modelos")) {
 
-            int idMarca = Integer.parseInt(request.getParameter("marca"));
+            Marca marca = new MarcaBuilder()
+                    .withId(Integer.parseInt(request.getParameter("marca")))
+                    .build();
 
+            Modelo modelo = new ModeloBuilder()
+                    .withMarca(marca)
+                    .build();
+            
             Gson gson = new Gson();
-            String listaJSON = gson.toJson(new ModeloDAO(Conexao.getConexao()).listarPorIdMarca(idMarca));
+            String listaJSON = gson.toJson(new ModeloDAO(Conexao.getConexao()).listarPorIdMarca(modelo));
             out.println(listaJSON);
 
         }

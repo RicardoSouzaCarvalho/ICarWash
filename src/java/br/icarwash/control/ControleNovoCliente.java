@@ -27,11 +27,11 @@ public class ControleNovoCliente extends HttpServlet {
                 .withCadastroCompleto(false)
                 .build();
 
-        int idUsuario = new UsuarioDAO(conexao).cadastrar(usuario);
+        usuario = new UsuarioDAO(conexao).cadastrar(usuario);
 
         EmailNovoCliente emailNovoCliente = new EmailNovoCliente("Novo cliente", usuario.getEmail());
 
-        if (idUsuario != 0) {
+        if (usuario.getId() != 0) {
             emailNovoCliente.start();
 
             new LoginController().validaLogin(request, response, new UsuarioDAO(conexao).usuarioLogin(usuario));

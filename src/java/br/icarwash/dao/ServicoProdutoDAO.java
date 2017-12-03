@@ -21,12 +21,12 @@ public class ServicoProdutoDAO {
         this.conexao = conexao;
     }
 
-    public void cadastraServicoProduto(int idServico, int idProduto, int quantidade) {
+    public void cadastraServicoProduto(ServicoProduto servicoProduto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INSERT);
-            pstmt.setInt(1, idServico);
-            pstmt.setInt(2, idProduto);
-            pstmt.setInt(3, quantidade);
+            pstmt.setInt(1, servicoProduto.getServico().getId());
+            pstmt.setInt(2, servicoProduto.getProduto().getId());
+            pstmt.setInt(3, servicoProduto.getQuantidade());
             pstmt.execute();
 
         } catch (SQLException e) {
@@ -34,12 +34,12 @@ public class ServicoProdutoDAO {
         }
     }
 
-    public void atualizarServicoProduto(int idServico, int idProduto, int quantidade) {
+    public void atualizarServicoProduto(ServicoProduto servicoProduto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(UPDATE_QTD);
-            pstmt.setInt(1, quantidade);
-            pstmt.setInt(2, idServico);
-            pstmt.setInt(3, idProduto);
+            pstmt.setInt(1, servicoProduto.getQuantidade());
+            pstmt.setInt(2, servicoProduto.getServico().getId());
+            pstmt.setInt(3, servicoProduto.getProduto().getId());
             pstmt.execute();
 
         } catch (SQLException e) {
@@ -47,11 +47,11 @@ public class ServicoProdutoDAO {
         }
     }
 
-    public void excluirServicoProduto(int idServico, int idProduto) {
+    public void excluirServicoProduto(ServicoProduto servicoProduto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(DELETE_BY_IDS);
-            pstmt.setInt(1, idServico);
-            pstmt.setInt(2, idProduto);
+            pstmt.setInt(1, servicoProduto.getServico().getId());
+            pstmt.setInt(2, servicoProduto.getProduto().getId());
             pstmt.execute();
 
         } catch (SQLException e) {
@@ -59,14 +59,13 @@ public class ServicoProdutoDAO {
         }
     }
 
-    public ArrayList<ServicoProduto> selecionaProdutosPorIdServico(int idServico) {
+    public ArrayList<ServicoProduto> selecionaProdutosPorIdServico(ServicoProduto servicoProduto) {
 
         ArrayList<ServicoProduto> servicosProdutos = new ArrayList<>();
-        Servico servico = new Servico.ServicoBuilder().withId(idServico).build();
 
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_PRODUTO_BY_ID_SERVICO);
-            pstmt.setInt(1, idServico);
+            pstmt.setInt(1, servicoProduto.getServico().getId());
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -75,7 +74,10 @@ public class ServicoProdutoDAO {
                         .withId(rs.getInt("id_produto"))
                         .build();
 
-                servicosProdutos.add(new ServicoProduto(servico, produto, rs.getInt("quantidade")));
+                servicoProduto.setProduto(produto);
+                servicoProduto.setQuantidade(rs.getInt("quantidade"));
+                
+                servicosProdutos.add(servicoProduto);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

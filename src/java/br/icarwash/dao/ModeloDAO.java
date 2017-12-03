@@ -20,12 +20,11 @@ public class ModeloDAO {
         this.conexao = conexao;
     }
 
-    public ArrayList<Modelo> listarPorIdMarca(int idMarca) {
+    public ArrayList<Modelo> listarPorIdMarca(Modelo modelo) {
         ArrayList<Modelo> modelos = new ArrayList();
-        Modelo modelo;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_ALL_BY_ID_MARCA);
-            pstmt.setString(1, Integer.toString(idMarca));
+            pstmt.setString(1, Integer.toString(modelo.getMarca().getId()));
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 modelo = new ModeloBuilder()
@@ -42,11 +41,10 @@ public class ModeloDAO {
         return modelos;
     }
 
-    public Modelo localizarPorId(int id) {
-        Modelo modelo = null;
+    public Modelo localizarPorId(Modelo modelo) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_ALL);
-            pstmt.setString(1, Integer.toString(id));
+            pstmt.setString(1, Integer.toString(modelo.getId()));
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 modelo = new ModeloBuilder()

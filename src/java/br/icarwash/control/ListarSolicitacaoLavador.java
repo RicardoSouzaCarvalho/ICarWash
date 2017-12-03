@@ -7,6 +7,7 @@ import br.icarwash.dao.LavadorDAO;
 import br.icarwash.dao.SolicitacaoDAO;
 import br.icarwash.model.Lavador;
 import br.icarwash.model.Solicitacao;
+import br.icarwash.model.Solicitacao.SolicitacaoBuilder;
 import br.icarwash.model.Usuario;
 import java.io.IOException;
 import java.sql.Connection;
@@ -33,7 +34,11 @@ public class ListarSolicitacaoLavador extends HttpServlet {
                 .build();
         lavador = new LavadorDAO(conexao).localizarPorIdUsuario(lavador);
 
-        ArrayList<Solicitacao> solicitacoes = new SolicitacaoDAO(conexao).listarSolicitacaoDoLavador(lavador.getId());
+        Solicitacao solicitacaoWithLavador = new SolicitacaoBuilder()
+                .withLavador(lavador)
+                .build();
+
+        ArrayList<Solicitacao> solicitacoes = new SolicitacaoDAO(conexao).listarSolicitacaoDoLavador(solicitacaoWithLavador);
 
         EnderecoDAO enderecoDAO = new EnderecoDAO(conexao);
         ClienteDAO clienteDAO = new ClienteDAO(conexao);

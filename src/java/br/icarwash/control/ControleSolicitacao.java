@@ -6,6 +6,7 @@ import br.icarwash.model.*;
 import br.icarwash.model.Cliente.ClienteBuilder;
 import br.icarwash.model.Endereco.EnderecoBuilder;
 import br.icarwash.model.Modelo.ModeloBuilder;
+import br.icarwash.model.Servico.ServicoBuilder;
 import br.icarwash.model.Solicitacao.SolicitacaoBuilder;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,7 +45,6 @@ public class ControleSolicitacao extends HttpServlet {
 
             /*PEGA OS PARAMETROS DA VIEW*/
             String[] IdServicosSolicitados = request.getParameterValues("servico");
-
             String[] data = request.getParameter("data_solicitacao").split("/");
             String dataSolicitacao = data[2] + "-" + data[1] + "-" + data[0];
             dataHoraSolicitacao.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dataSolicitacao + " " + request.getParameter("selectHora")));
@@ -52,7 +52,6 @@ public class ControleSolicitacao extends HttpServlet {
             Endereco endereco;
 
             if (Boolean.parseBoolean(request.getParameter("cadastraEndereco"))) {
-
                 endereco = new EnderecoBuilder()
                         .withCep(request.getParameter("cep"))
                         .withEstado(request.getParameter("estado"))
@@ -69,16 +68,16 @@ public class ControleSolicitacao extends HttpServlet {
                 int idEndereco = Integer.parseInt(request.getParameter("endereco"));
                 endereco = new EnderecoBuilder().withId(idEndereco).build();
             }
-
-            Servico servico;
-            ServicoDAO servicoDAO = new ServicoDAO(conexao);
+            Modelo modelo = new ModeloBuilder()
+                    .withId(Integer.parseInt(request.getParameter("modelo")))
+                    .build();
 
             Solicitacao solicitacao = new SolicitacaoBuilder()
                     .withCliente(cliente)
                     .withSolicitacaoState(new EmAnalise())
-                    .withModelo(new ModeloBuilder().withId(Integer.parseInt(request.getParameter("modelo"))).build())
+                    .withModelo(modelo)
                     .withDataSolicitacao(dataHoraSolicitacao)
-                    .withValorTotal(somaValorTotalSolicitacao(IdServicosSolicitados, servicoDAO))
+                    .withValorTotal(somaValorTotalSolicitacao(request))
                     .withEndereco(endereco)
                     .build();
 
@@ -86,8 +85,13 @@ public class ControleSolicitacao extends HttpServlet {
 
             SolicitacaoServicoDAO solicitacaoServicoDAO = new SolicitacaoServicoDAO(conexao);
 
+            Servico servico;
+            ServicoDAO servicoDAO = new ServicoDAO(conexao);
             for (String idServico : IdServicosSolicitados) {
-                servico = servicoDAO.localizarPorId(Integer.parseInt(idServico));
+                servico = new ServicoBuilder()
+                        .withId(Integer.parseInt(idServico))
+                        .build();
+                servico = servicoDAO.localizarPorId(servico);
                 solicitacaoServicoDAO.cadastraSolicitacaoServico(idSolicitacao, servico.getId());
             }
 
@@ -106,12 +110,19 @@ public class ControleSolicitacao extends HttpServlet {
 
     }
 
-    private BigDecimal somaValorTotalSolicitacao(String[] IdServicosSolicitados, ServicoDAO servicoDAO) {
+    private BigDecimal somaValorTotalSolicitacao(HttpServletRequest request) {
+        Connection conexao = (Connection) request.getAttribute("conexao");
+        String[] IdServicosSolicitados = request.getParameterValues("servico");
+
         Servico servico;
+        ServicoDAO servicoDAO = new ServicoDAO(conexao);
         double valor = 0;
 
         for (String idServico : IdServicosSolicitados) {
-            servico = servicoDAO.localizarPorId(Integer.parseInt(idServico));
+            servico = new ServicoBuilder()
+                    .withId(Integer.parseInt(idServico))
+                    .build();
+            servico = servicoDAO.localizarPorId(servico);
             valor += servico.getValor().doubleValue();
         }
         BigDecimal valorTotal = new BigDecimal(valor);

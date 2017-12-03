@@ -29,7 +29,7 @@ public class EmAnalise implements SolicitacaoState {
     }
 
     @Override
-    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao, Avaliacao avaliacao) {
+    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao) {
         return this;
     }
 
@@ -40,7 +40,7 @@ public class EmAnalise implements SolicitacaoState {
 
     @Override
     public SolicitacaoState cancelarSolicitacao(Solicitacao solicitacao) {
-        new SolicitacaoDAO(Conexao.getConexao()).cancelarSolicitacaoPorId(solicitacao.getId());
+        new SolicitacaoDAO(Conexao.getConexao()).cancelarSolicitacaoPorId(solicitacao);
         return new Cancelado();
     }
 

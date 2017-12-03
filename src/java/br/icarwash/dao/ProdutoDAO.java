@@ -35,7 +35,7 @@ public class ProdutoDAO {
         }
     }
 
-    public ArrayList listar() {
+    public ArrayList<Produto> listar() {
         ArrayList<Produto> produtos = new ArrayList();
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_ALL);
@@ -55,11 +55,10 @@ public class ProdutoDAO {
         return produtos;
     }
 
-    public Produto localizarPorId(int id) {
-        Produto produto = null;
+    public Produto localizarPorId(Produto produto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID);
-            pstmt.setString(1, Integer.toString(id));
+            pstmt.setString(1, Integer.toString(produto.getId()));
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 produto = new Produto.ProdutoBuilder()
@@ -87,20 +86,20 @@ public class ProdutoDAO {
         }
     }
 
-    public void inativar(int id) {
+    public void inativar(Produto produto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INACTIVE_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, produto.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void ativar(int id) {
+    public void ativar(Produto produto) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(ACTIVE_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, produto.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

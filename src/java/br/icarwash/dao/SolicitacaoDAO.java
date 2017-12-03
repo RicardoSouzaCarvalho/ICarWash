@@ -35,7 +35,6 @@ public class SolicitacaoDAO {
     private static final String SELECT_BY_ID_LAVADOR = "select * FROM solicitacao where id_lavador = ? order by data_solicitacao";
     private static final String SELECT_SOLICITACAO_HOJE_LAVADOR = "select * from solicitacao where id_lavador = ? and DATE(DATE_FORMAT(data_solicitacao, '%Y-%m-%d')) = CURDATE()";
     private static final String SELECT_EM_ANALISE = "SELECT * FROM solicitacao where solicitacao.status = 'Em Analise'";
-    private static final String SELECT_ID_ULTIMA_SOLICITACAO = "SELECT id FROM solicitacao WHERE id = (SELECT MAX(id) FROM solicitacao)";
     private static final String SELECT_HORARIO_INDISPONIVEL = "SELECT data_solicitacao as hora, STATUS, count(*) as quantidade FROM solicitacao where  (status like 'Em Analise' or status like 'Agendado') and data_solicitacao like ? group by hora having quantidade >= ?";
     private static final String SELECT_QTD_SOLICITACAO_BY_IDLAVADOR_AND_DATE = "select count(*) as quantidade FROM solicitacao where id_lavador = ? and status <> 'Cancelado' and data_solicitacao like ?";
     private static final String SELECT_CHECK_LAVADORES_DISPONIVEIS = "select * FROM solicitacao where id_lavador = ? and data_solicitacao = ? and status <> 'Cancelado' and status <> 'Avaliado'";
@@ -76,9 +75,8 @@ public class SolicitacaoDAO {
         return idSolicitacao;
     }
 
-    public ArrayList<Solicitacao> listarSolicitacaoPorIDCliente(int id) {
+    public ArrayList<Solicitacao> listarSolicitacaoPorIDCliente(Solicitacao solicitacao) {
         ArrayList<Solicitacao> solicitacoes = new ArrayList();
-        Solicitacao solicitacao;
         Cliente cliente;
         Lavador lavador;
         AvaliacaoBuilder avaliacaoBuilder;
@@ -86,7 +84,7 @@ public class SolicitacaoDAO {
 
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID_CLIENTE);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, solicitacao.getCliente().getId());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
 
@@ -128,16 +126,15 @@ public class SolicitacaoDAO {
         return solicitacoes;
     }
 
-    public ArrayList<Solicitacao> listarSolicitacaoDoLavador(int id) {
+    public ArrayList<Solicitacao> listarSolicitacaoDoLavador(Solicitacao solicitacao) {
         ArrayList<Solicitacao> solicitacoes = new ArrayList();
-        Solicitacao solicitacao;
         Cliente cliente;
         Endereco endereco;
         Avaliacao avaliacao;
         SolicitacaoState solicitacaoState;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID_LAVADOR);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, solicitacao.getLavador().getId());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
 
@@ -177,15 +174,14 @@ public class SolicitacaoDAO {
         return solicitacoes;
     }
 
-    public ArrayList<Solicitacao> listarSolicitacaoHojeLavador(int id) {
+    public ArrayList<Solicitacao> listarSolicitacaoHojeLavador(Solicitacao solicitacao) {
         ArrayList<Solicitacao> solicitacoes = new ArrayList();
-        Solicitacao solicitacao;
         Cliente cliente;
         Endereco endereco;
         SolicitacaoState solicitacaoState;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_SOLICITACAO_HOJE_LAVADOR);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1,solicitacao.getLavador().getId());
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -220,15 +216,14 @@ public class SolicitacaoDAO {
         return solicitacoes;
     }
 
-    public Solicitacao localizarPorId(int id) {
-        Solicitacao solicitacao = null;
+    public Solicitacao localizarPorId(Solicitacao solicitacao) {
         Cliente cliente;
         Lavador lavador;
         Endereco endereco;
         SolicitacaoState solicitacaoState;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, solicitacao.getId());
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -267,7 +262,7 @@ public class SolicitacaoDAO {
         return solicitacao;
     }
 
-    public ArrayList listar() {
+    public ArrayList<Solicitacao> listar() {
         ArrayList<Solicitacao> solicitacoes = new ArrayList();
         Solicitacao solicitacao;
         Cliente cliente;
@@ -307,7 +302,7 @@ public class SolicitacaoDAO {
         return solicitacoes;
     }
 
-    public ArrayList listarEmAnalise() {
+    public ArrayList<Solicitacao> listarEmAnalise() {
         ArrayList<Solicitacao> solicitacoes = new ArrayList();
         Solicitacao solicitacao;
         Cliente cliente;
@@ -347,10 +342,10 @@ public class SolicitacaoDAO {
         return solicitacoes;
     }
 
-    public void cancelarSolicitacaoPorId(int id) {
+    public void cancelarSolicitacaoPorId(Solicitacao solicitacao) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(CANCELA);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, solicitacao.getId());
             pstmt.execute();
 
         } catch (SQLException e) {
@@ -380,10 +375,10 @@ public class SolicitacaoDAO {
         }
     }
 
-    public void avaliarSolicitacao(Solicitacao solicitacao, Avaliacao avaliacao) {
+    public void avaliarSolicitacao(Solicitacao solicitacao) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(AVALIA);
-            pstmt.setInt(1, avaliacao.getId());
+            pstmt.setInt(1, solicitacao.getAvaliacao().getId());
             pstmt.setInt(2, solicitacao.getId());
             pstmt.execute();
 
@@ -414,10 +409,10 @@ public class SolicitacaoDAO {
         }
     }
 
-    public void atribuirLavador(Lavador lavador, Solicitacao solicitacao) {
+    public void atribuirLavador(Solicitacao solicitacao) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(ATRIBUI_LAVADOR);
-            pstmt.setInt(1, lavador.getId());
+            pstmt.setInt(1, solicitacao.getLavador().getId());
             pstmt.setInt(2, solicitacao.getId());
             pstmt.execute();
 

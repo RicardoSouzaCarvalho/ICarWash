@@ -22,6 +22,7 @@ public class Produto {
         private String descricao;
         private boolean ativo;
 
+
         public ProdutoBuilder from(Produto produto) {
             this.id = produto.id;
             this.nome = produto.nome;

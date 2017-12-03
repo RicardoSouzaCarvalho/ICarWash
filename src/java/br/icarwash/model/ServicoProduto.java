@@ -1,9 +1,13 @@
 package br.icarwash.model;
 
 public class ServicoProduto {
+
     private Servico servico;
     private Produto produto;
     private int quantidade;
+
+    public ServicoProduto() {
+    }
 
     public ServicoProduto(Servico servico, Produto produto, int quantidade) {
         this.servico = servico;
@@ -34,6 +38,5 @@ public class ServicoProduto {
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
-
 
 }

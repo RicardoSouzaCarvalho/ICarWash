@@ -23,8 +23,7 @@ public class ServicoDAO {
         this.conexao = conexao;
     }
 
-    public int cadastrar(Servico servico) {
-        int idServico = 0;
+    public Servico cadastrar(Servico servico) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, servico.getNome());
@@ -36,16 +35,16 @@ public class ServicoDAO {
 
             final ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
-                idServico = rs.getInt(1);
+                servico.setId(rs.getInt(1));
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return idServico;
+        return servico;
     }
 
-    public ArrayList listar() {
+    public ArrayList<Servico> listar() {
         ArrayList<Servico> servicos = new ArrayList();
         Servico servico;
         try {
@@ -67,11 +66,10 @@ public class ServicoDAO {
         return servicos;
     }
 
-    public Servico localizarPorId(int id) {
-        Servico servico = null;
+    public Servico localizarPorId(Servico servico) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID);
-            pstmt.setString(1, Integer.toString(id));
+            pstmt.setString(1, Integer.toString(servico.getId()));
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 servico = new ServicoBuilder()
@@ -101,20 +99,20 @@ public class ServicoDAO {
         }
     }
 
-    public void inativar(int id) {
+    public void inativar(Servico servico) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INACTIVE_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, servico.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void ativar(int id) {
+    public void ativar(Servico servico) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(ACTIVE_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, servico.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

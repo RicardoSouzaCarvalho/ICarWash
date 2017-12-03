@@ -59,7 +59,7 @@ public class ListaCommand implements ICommand {
         UsuarioDAO usuarioDAO = new UsuarioDAO(conexao);
 
         clientes.forEach((cliente) -> {
-            cliente.setUsuario(usuarioDAO.localizarUsuarioPorID(cliente.getUsuario().getId()));
+            cliente.setUsuario(usuarioDAO.localizarUsuarioPorID(cliente.getUsuario()));
         });
 
         request.setAttribute("clientes", clientes);
@@ -76,7 +76,7 @@ public class ListaCommand implements ICommand {
         Usuario usuario;
 
         for (Lavador lavador : lavadores) {
-            usuario = usuarioDAO.localizarUsuarioPorID(lavador.getUsuario().getId());
+            usuario = usuarioDAO.localizarUsuarioPorID(lavador.getUsuario());
             lavador.setUsuario(usuario);
         };
 

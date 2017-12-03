@@ -38,7 +38,7 @@ public class ContinuarCadastro extends HttpServlet {
 
         new ClienteDAO(conexao).cadastrar(cliente);
 
-        new UsuarioDAO(conexao).concluirCadastro(usuario.getId());
+        new UsuarioDAO(conexao).concluirCadastro(usuario);
 
         usuario.setCadastroCompleto(true);
         session.setAttribute("user", usuario);

@@ -79,7 +79,8 @@ public class FiltroAcesso implements Filter {
                         Lavador lavador = new LavadorBuilder()
                                 .withUsuario(usuario)
                                 .build();
-                        session.setAttribute("nome", new LavadorDAO(Conexao.getConexao()).localizarPorIdUsuario(lavador).getNome());
+                        lavador = new LavadorDAO(Conexao.getConexao()).localizarPorIdUsuario(lavador);
+                        session.setAttribute("nome", lavador.getNome());
                         request.getRequestDispatcher("/painel_lavador.jsp").forward(request, response);
                         break;
                     case 1:

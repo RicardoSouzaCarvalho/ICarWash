@@ -2,6 +2,10 @@ package br.icarwash.control.command;
 
 import br.icarwash.dao.ProdutoDAO;
 import br.icarwash.dao.ServicoDAO;
+import br.icarwash.model.Produto;
+import br.icarwash.model.Produto.ProdutoBuilder;
+import br.icarwash.model.Servico;
+import br.icarwash.model.Servico.ServicoBuilder;
 import java.io.IOException;
 import java.sql.Connection;
 import javax.servlet.ServletException;
@@ -18,11 +22,17 @@ public class AtivaCommand implements ICommand {
 
         switch (ativar) {
             case "produto": {
-                new ProdutoDAO(conexao).ativar(id);
+                Produto produto = new ProdutoBuilder()
+                        .withId(id)
+                        .build();
+                new ProdutoDAO(conexao).ativar(produto);
                 return "/Controle?action=ListaCommand&listar=produto";
             }
             case "servico": {
-                new ServicoDAO(conexao).ativar(id);
+                Servico servico = new ServicoBuilder()
+                        .withId(id)
+                        .build();
+                new ServicoDAO(conexao).ativar(servico);
                 return "/Controle?action=ListaCommand&listar=servico";
             }
             default:

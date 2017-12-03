@@ -35,8 +35,14 @@ public class ListarSolicitacaoHojeLavador extends HttpServlet {
         Lavador lavador = new LavadorBuilder()
                 .withUsuario(usuario)
                 .build();
-        ArrayList<Solicitacao> solicitacoes = solicitacaoDAO.listarSolicitacaoHojeLavador(new LavadorDAO(conexao).localizarPorIdUsuario(lavador).getId());
-        
+
+        lavador = new LavadorDAO(conexao).localizarPorIdUsuario(lavador);
+
+        Solicitacao solicitacaoWithLavador = new Solicitacao.SolicitacaoBuilder()
+                .withLavador(lavador)
+                .build();
+
+        ArrayList<Solicitacao> solicitacoes = solicitacaoDAO.listarSolicitacaoHojeLavador(solicitacaoWithLavador);
 
         EnderecoDAO enderecoDAO = new EnderecoDAO(conexao);
         ClienteDAO clienteDAO = new ClienteDAO(conexao);

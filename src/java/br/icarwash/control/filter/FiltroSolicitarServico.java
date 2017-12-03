@@ -67,7 +67,7 @@ public class FiltroSolicitarServico implements Filter {
 
         if (usuario != null && usuario.getNivel() == 1) {
             try {
-                if (!new UsuarioDAO(conexao).isCadastroCompleto(usuario.getId())) {
+                if (!new UsuarioDAO(conexao).isCadastroCompleto(usuario)) {
                     RequestDispatcher rd = request.getRequestDispatcher("continuar_cadastro_cliente.jsp");
                     rd.forward(request, response);
                 } else {

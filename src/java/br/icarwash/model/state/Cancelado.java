@@ -26,7 +26,7 @@ public class Cancelado implements SolicitacaoState {
     }
 
     @Override
-    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao, Avaliacao avaliacao) {
+    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao) {
         return this;
     }
 

@@ -28,8 +28,7 @@ public class UsuarioDAO {
         this.conexao = conexao;
     }
 
-    public int cadastrar(Usuario usuario) {
-        int idUsuario = 0;
+    public Usuario cadastrar(Usuario usuario) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(CREATE_USUARIO, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, usuario.getEmail());
@@ -42,13 +41,13 @@ public class UsuarioDAO {
 
             final ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
-                idUsuario = rs.getInt(1);
+                usuario.setId(rs.getInt(1));
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return idUsuario;
+        return usuario;
     }
 
     public Usuario usuarioLogin(Usuario usuarioLogin) {//terminar de implementar
@@ -78,29 +77,12 @@ public class UsuarioDAO {
         return usuario;
     }
 
-    public int localizarIdPorEmailUsuario(String emailUsuario) {
-        int idUsuario = 0;
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(SELECT_ID_BY_USUARIO);
-            pstmt.setString(1, emailUsuario);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                idUsuario = rs.getInt("id");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return idUsuario;
-    }
-
-    public Usuario localizarUsuarioPorID(int idUsuario) {
-        Usuario usuario = null;
+    public Usuario localizarUsuarioPorID(Usuario usuario) {
         Calendar dataCadastro = Calendar.getInstance();
         Timestamp timestamp;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_USUARIO_BY_ID);
-            pstmt.setInt(1, idUsuario);
+            pstmt.setInt(1, usuario.getId());
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
 
@@ -123,11 +105,11 @@ public class UsuarioDAO {
         return usuario;
     }
 
-    public boolean checkEmailDisponivel(String email) {
+    public boolean checkEmailDisponivel(Usuario usuario) {
 
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_ID_BY_EMAIL);
-            pstmt.setString(1, email);
+            pstmt.setString(1, usuario.getEmail());
             ResultSet rs = pstmt.executeQuery();
             return !rs.next();
         } catch (SQLException e) {
@@ -135,11 +117,11 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean isCadastroCompleto(int id) {
+    public boolean isCadastroCompleto(Usuario usuario) {
         boolean cadastro = false;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_CADASTRO_COMPLETO);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, usuario.getId());
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 cadastro = rs.getBoolean("cadastro_completo");
@@ -150,20 +132,20 @@ public class UsuarioDAO {
         return cadastro;
     }
 
-    public void concluirCadastro(int idUusuario) {
+    public void concluirCadastro(Usuario usuario) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(UPDATE_CONCLUIR_CAD);
-            pstmt.setInt(1, idUusuario);
+            pstmt.setInt(1, usuario.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void inativar(int id) {
+    public void inativar(Usuario usuario) {
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INACTIVE_BY_ID);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, usuario.getId());
             pstmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -181,11 +163,11 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean isAtivo(int id) {
+    public boolean isAtivo(Usuario usuario) {
         boolean ativo = false;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(USUARIO_ATIVO);
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, usuario.getId());
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 ativo = rs.getBoolean("ativo");

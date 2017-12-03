@@ -216,7 +216,7 @@ public class Solicitacao {
     }
 
     public void avaliarSolicitacao() {
-        this.estado = this.estado.avaliarSolicitacao(this, this.avaliacao);
+        this.estado = this.estado.avaliarSolicitacao(this);
     }
 
     public void concluirSolicitacao() {
@@ -238,7 +238,7 @@ public class Solicitacao {
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexao);
             
             for (int i = 0; i < lavadoresAtivos.size() - 1; i++) {
-                if (!usuarioDAO.isAtivo(lavadoresAtivos.get(i).getUsuario().getId())) {
+                if (!usuarioDAO.isAtivo(lavadoresAtivos.get(i).getUsuario())) {
                     lavadoresAtivos.remove(lavadoresAtivos.get(i));
                 }
             }
@@ -248,10 +248,11 @@ public class Solicitacao {
             lavadoresDisponiveis = removeLavadoresDaLista(lavadoresDisponiveis, conexao);
             Random random = new Random();
 
-            int qtdLavadores = random.nextInt(lavadoresDisponiveis.size());
+            int lavadorSorteado = random.nextInt(lavadoresDisponiveis.size());
 
-            this.setLavador(lavadoresDisponiveis.get(qtdLavadores));
-            solicitacaoDAO.atribuirLavador(this.lavador, this);
+            setLavador(lavadoresDisponiveis.get(lavadorSorteado));
+            
+            solicitacaoDAO.atribuirLavador(this);
             solicitacaoDAO.agendarSolicitacao(this);
 
             conexao.commit();

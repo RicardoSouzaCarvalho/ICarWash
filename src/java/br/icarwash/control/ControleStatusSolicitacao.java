@@ -10,6 +10,7 @@ import br.icarwash.model.Avaliacao.AvaliacaoBuilder;
 import br.icarwash.model.Cliente;
 import br.icarwash.model.Lavador;
 import br.icarwash.model.Solicitacao;
+import br.icarwash.model.Solicitacao.SolicitacaoBuilder;
 import br.icarwash.model.Usuario;
 import br.icarwash.util.email.EmailStatusSolicitacaoCliente;
 import br.icarwash.util.email.EmailStatusSolicitacaoLavador;
@@ -133,11 +134,14 @@ public class ControleStatusSolicitacao extends HttpServlet {
 
         Connection conexao = (Connection) request.getAttribute("conexao");
 
-        Solicitacao solicitacao = new SolicitacaoDAO(conexao)
-                .localizarPorId(Integer.parseInt(request.getParameter("id_solicitacao")));
+        Solicitacao solicitacao = new SolicitacaoBuilder()
+                .withId(Integer.parseInt(request.getParameter("id_solicitacao")))
+                .build();
+        
+        solicitacao = new SolicitacaoDAO(conexao).localizarPorId(solicitacao);
 
         Cliente cliente = new ClienteDAO(conexao).localizarPorId(solicitacao.getCliente());
-        cliente.setUsuario(new UsuarioDAO(conexao).localizarUsuarioPorID(cliente.getUsuario().getId()));
+        cliente.setUsuario(new UsuarioDAO(conexao).localizarUsuarioPorID(cliente.getUsuario()));
 
         solicitacao.setCliente(cliente);
 
@@ -153,7 +157,7 @@ public class ControleStatusSolicitacao extends HttpServlet {
     private Lavador buscarLavador(Lavador lavador, HttpServletRequest request) {
         Connection conexao = (Connection) request.getAttribute("conexao");
         lavador = new LavadorDAO(conexao).localizarPorId(lavador);
-        lavador.setUsuario(new UsuarioDAO(conexao).localizarUsuarioPorID(lavador.getUsuario().getId()));
+        lavador.setUsuario(new UsuarioDAO(conexao).localizarUsuarioPorID(lavador.getUsuario()));
         return lavador;
     }
 }

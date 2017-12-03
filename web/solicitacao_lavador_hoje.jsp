@@ -7,7 +7,7 @@
 <script src="js/jquery.star-rating-svg.js"></script>
 
     <div class="row">
-        <h4>Minhas solicitações para hoje</h4>
+         <p class="titulo-controle">Solicitações para hoje</p>
         <div class="divider"></div>
     </div>
     <table class="table table-hover centered striped responsive-table">

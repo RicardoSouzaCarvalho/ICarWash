@@ -36,6 +36,7 @@ public class EmProcesso implements SolicitacaoState {
             conexao.setAutoCommit(false);
 
             new LavadorDAO(conexao).desocuparLavador(solicitacao.getLavador());
+            
             new SolicitacaoDAO(conexao).finalizarSolicitacao(solicitacao);
 
             conexao.commit();
@@ -60,7 +61,7 @@ public class EmProcesso implements SolicitacaoState {
     }
 
     @Override
-    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao, Avaliacao avaliacao) {
+    public SolicitacaoState avaliarSolicitacao(Solicitacao solicitacao) {
         return this;
     }
 

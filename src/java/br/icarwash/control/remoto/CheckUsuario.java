@@ -1,6 +1,8 @@
 package br.icarwash.control.remoto;
 
 import br.icarwash.dao.UsuarioDAO;
+import br.icarwash.model.Usuario;
+import br.icarwash.model.Usuario.UsuarioBuilder;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -20,7 +22,11 @@ public class CheckUsuario extends HttpServlet {
         
         PrintWriter out = response.getWriter();
 
-        out.print(new UsuarioDAO(conexao).checkEmailDisponivel(request.getParameter("email")));
+        Usuario usuario = new UsuarioBuilder()
+                .withEmail(request.getParameter("email"))
+                .build();
+        
+        out.print(new UsuarioDAO(conexao).checkEmailDisponivel(usuario));
         out.flush();
     }
 

@@ -143,7 +143,7 @@ public class LavadorDAO {
         Endereco endereco;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(SELECT_BY_ID_USUARIO);
-            pstmt.setString(1, Integer.toString(lavador.getId()));
+            pstmt.setString(1, Integer.toString(lavador.getUsuario().getId()));
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
 
