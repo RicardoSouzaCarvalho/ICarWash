@@ -8,7 +8,9 @@ import br.icarwash.model.Endereco.EnderecoBuilder;
 import br.icarwash.model.Modelo.ModeloBuilder;
 import br.icarwash.model.Servico.ServicoBuilder;
 import br.icarwash.model.Solicitacao.SolicitacaoBuilder;
+import br.icarwash.util.boleto.GerarBoleto;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -16,9 +18,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import org.jrimum.bopepo.Boleto;
+import org.jrimum.bopepo.view.BoletoViewer;
 
 @WebServlet(name = "ControleSolicitacao", urlPatterns = "/ControleSolicitacao")
 public class ControleSolicitacao extends HttpServlet {
@@ -67,6 +72,7 @@ public class ControleSolicitacao extends HttpServlet {
             } else {
                 int idEndereco = Integer.parseInt(request.getParameter("endereco"));
                 endereco = new EnderecoBuilder().withId(idEndereco).build();
+                endereco =  new EnderecoDAO(conexao).localizarPorId(endereco);
             }
             Modelo modelo = new ModeloBuilder()
                     .withId(Integer.parseInt(request.getParameter("modelo")))
@@ -95,6 +101,14 @@ public class ControleSolicitacao extends HttpServlet {
                 solicitacaoServicoDAO.cadastraSolicitacaoServico(idSolicitacao, servico.getId());
             }
 
+            
+            Boleto boleto = new GerarBoleto(solicitacao).gerar();
+
+            request.setAttribute("boleto", boleto);
+
+            RequestDispatcher rd = request.getRequestDispatcher("/segunda-via-boleto");
+            rd.forward(request, response);
+            
         } catch (ParseException ex) {
             try {
                 conexao.rollback();
@@ -103,10 +117,6 @@ public class ControleSolicitacao extends HttpServlet {
                 throw new RuntimeException(ex1);
             }
         }
-
-        PrintWriter out = response.getWriter();
-        out.println("/ICarWash/solicitacoes-cliente?ok"); //ListarSolicitacaoCliente
-        out.flush();
 
     }
 
@@ -131,7 +141,7 @@ public class ControleSolicitacao extends HttpServlet {
             servico = servicoDAO.localizarPorId(servico);
             valor += servico.getValor().doubleValue();
         }
-        
+
         valor *= modelo.getPorte().getTaxa();
 
         BigDecimal valorTotal = new BigDecimal(valor);

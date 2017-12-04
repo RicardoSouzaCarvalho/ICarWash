@@ -63,6 +63,7 @@ $("#confirmar").click(function () {
             data: dataString,
             cache: false,
             success: function (result) {
+                
                 window.location = result;
             }
         });
