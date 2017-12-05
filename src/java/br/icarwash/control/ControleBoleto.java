@@ -1,26 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.icarwash.control;
 
+import br.icarwash.model.Solicitacao;
+import br.icarwash.util.boleto.GerarBoleto;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.jrimum.bopepo.Boleto;
 import org.jrimum.bopepo.view.BoletoViewer;
 
-/**
- *
- * @author Mirian
- */
-@WebServlet(name = "ControleBoleto", urlPatterns = {"/segunda-via-boleto"})
+@WebServlet(name = "ControleBoleto", urlPatterns = {"/via-boleto"})
 public class ControleBoleto extends HttpServlet {
 
     /**
@@ -34,8 +27,11 @@ public class ControleBoleto extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Boleto boleto = (Boleto) request.getAttribute("boleto");
+        HttpSession session = ((HttpServletRequest) request).getSession(true);
+        Solicitacao solicitacao = (Solicitacao) session.getAttribute("solicitacao");
 
+        Boleto boleto = new GerarBoleto(solicitacao).gerar();
+        
         BoletoViewer viewer = new BoletoViewer(boleto);
         byte[] pdfAsBytes = viewer.getPdfAsByteArray();
 

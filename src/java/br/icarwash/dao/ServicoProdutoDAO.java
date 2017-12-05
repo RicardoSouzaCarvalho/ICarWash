@@ -1,7 +1,6 @@
 package br.icarwash.dao;
 
 import br.icarwash.model.Produto;
-import br.icarwash.model.Servico;
 import br.icarwash.model.ServicoProduto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

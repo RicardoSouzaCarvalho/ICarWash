@@ -41,6 +41,7 @@ public class Solicitacao {
     private Modelo modelo;
     private Calendar dataSolicitacao;
     private BigDecimal valorTotal;
+    private ArrayList<Servico> servicos;
 
     public Solicitacao() {
     }
@@ -55,6 +56,7 @@ public class Solicitacao {
         this.modelo = builder.modelo;
         this.dataSolicitacao = builder.dataSolicitacao;
         this.valorTotal = builder.valorTotal;
+        this.servicos = builder.servicos;
     }
 
     public SolicitacaoState validarStatus(String status) throws UnsupportedOperationException, SQLException {
@@ -98,6 +100,7 @@ public class Solicitacao {
         private Modelo modelo;
         private Calendar dataSolicitacao;
         private BigDecimal valorTotal;
+        private ArrayList<Servico> servicos;
 
         public SolicitacaoBuilder from(Solicitacao solicitacao) {
             this.id = solicitacao.id;
@@ -109,6 +112,7 @@ public class Solicitacao {
             this.modelo = solicitacao.modelo;
             this.dataSolicitacao = solicitacao.dataSolicitacao;
             this.valorTotal = solicitacao.valorTotal;
+            this.servicos = solicitacao.servicos;
 
             return this;
         }
@@ -155,6 +159,11 @@ public class Solicitacao {
 
         public SolicitacaoBuilder withValorTotal(BigDecimal valorTotal) {
             this.valorTotal = valorTotal;
+            return this;
+        }
+
+        public SolicitacaoBuilder withServicos(ArrayList<Servico> servicos) {
+            this.servicos = servicos;
             return this;
         }
 
@@ -236,6 +245,14 @@ public class Solicitacao {
         this.endereco = endereco;
     }
 
+    public ArrayList<Servico> getServicos() {
+        return servicos;
+    }
+
+    public void setServicos(ArrayList<Servico> servicos) {
+        this.servicos = servicos;
+    }
+
     public void analisarSolicitacao() {
         this.estado = this.estado.analisarSolicitacao(this);
     }
@@ -273,7 +290,7 @@ public class Solicitacao {
             SolicitacaoDAO solicitacaoDAO = new SolicitacaoDAO(conexao);
             ArrayList<Lavador> lavadoresAtivos = new LavadorDAO(conexao).listar();
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexao);
-            
+
             for (int i = 0; i < lavadoresAtivos.size() - 1; i++) {
                 if (!usuarioDAO.isAtivo(lavadoresAtivos.get(i).getUsuario())) {
                     lavadoresAtivos.remove(lavadoresAtivos.get(i));
@@ -288,7 +305,7 @@ public class Solicitacao {
             int lavadorSorteado = random.nextInt(lavadoresDisponiveis.size());
 
             setLavador(lavadoresDisponiveis.get(lavadorSorteado));
-            
+
             solicitacaoDAO.atribuirLavador(this);
             solicitacaoDAO.agendarSolicitacao(this);
 
@@ -317,7 +334,7 @@ public class Solicitacao {
     private ArrayList<Lavador> removeLavadoresDaLista(ArrayList<Lavador> lavadoresDisponiveis, Connection conexao) throws NumberFormatException {
         Map<String, Integer> mapa = new HashMap<>();
         SolicitacaoDAO solicitacaoDAO = new SolicitacaoDAO(conexao);
-        
+
         lavadoresDisponiveis.forEach((lavadorDisponivel) -> {
             mapa.put(String.valueOf(lavadorDisponivel.getId()), solicitacaoDAO.quantidadeSolicitacao(lavadorDisponivel.getId(), this.dataSolicitacao));
         });

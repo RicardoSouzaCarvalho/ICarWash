@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -71,44 +72,53 @@ public class ControleSolicitacao extends HttpServlet {
 
             } else {
                 int idEndereco = Integer.parseInt(request.getParameter("endereco"));
-                endereco = new EnderecoBuilder().withId(idEndereco).build();
-                endereco =  new EnderecoDAO(conexao).localizarPorId(endereco);
+                endereco = new EnderecoBuilder()
+                        .withId(idEndereco)
+                        .build();
+                endereco = new EnderecoDAO(conexao).localizarPorId(endereco);
             }
+
             Modelo modelo = new ModeloBuilder()
                     .withId(Integer.parseInt(request.getParameter("modelo")))
                     .build();
+            modelo = new ModeloDAO(conexao).localizarPorId(modelo);
 
             Solicitacao solicitacao = new SolicitacaoBuilder()
                     .withCliente(cliente)
                     .withSolicitacaoState(new EmAnalise())
                     .withModelo(modelo)
                     .withDataSolicitacao(dataHoraSolicitacao)
-                    .withValorTotal(somaValorTotalSolicitacao(request))
+                    .withValorTotal(somaValorTotalSolicitacao(request, modelo))
                     .withEndereco(endereco)
                     .build();
 
-            int idSolicitacao = new SolicitacaoDAO(conexao).cadastrar(solicitacao);
+            solicitacao = new SolicitacaoDAO(conexao).cadastrar(solicitacao);
 
             SolicitacaoServicoDAO solicitacaoServicoDAO = new SolicitacaoServicoDAO(conexao);
+            SolicitacaoServico solicitacaoServico = new SolicitacaoServico();
+            solicitacaoServico.setSolicitacao(solicitacao);
 
             Servico servico;
             ServicoDAO servicoDAO = new ServicoDAO(conexao);
+            ArrayList<Servico> servicos = new ArrayList<>();
+
             for (String idServico : IdServicosSolicitados) {
                 servico = new ServicoBuilder()
                         .withId(Integer.parseInt(idServico))
                         .build();
                 servico = servicoDAO.localizarPorId(servico);
-                solicitacaoServicoDAO.cadastraSolicitacaoServico(idSolicitacao, servico.getId());
+                servicos.add(servico);
+
+                solicitacaoServico.setServico(servico);
+                solicitacaoServicoDAO.cadastraSolicitacaoServico(solicitacaoServico);
             }
 
-            
-            Boleto boleto = new GerarBoleto(solicitacao).gerar();
+            solicitacao.setServicos(servicos);
+//            session.setAttribute("boleto", boleto);
+            session.setAttribute("solicitacao", solicitacao);
 
-            request.setAttribute("boleto", boleto);
-
-            RequestDispatcher rd = request.getRequestDispatcher("/segunda-via-boleto");
-            rd.forward(request, response);
-            
+//            RequestDispatcher rd = request.getRequestDispatcher("/via-boleto");
+//            rd.forward(request, response);
         } catch (ParseException ex) {
             try {
                 conexao.rollback();
@@ -118,17 +128,15 @@ public class ControleSolicitacao extends HttpServlet {
             }
         }
 
+        PrintWriter out = response.getWriter();
+        out.println("/ICarWash/confirmar-pedido");
+        out.flush();
+
     }
 
-    private BigDecimal somaValorTotalSolicitacao(HttpServletRequest request) {
+    private BigDecimal somaValorTotalSolicitacao(HttpServletRequest request, Modelo modelo) {
         Connection conexao = (Connection) request.getAttribute("conexao");
         String[] IdServicosSolicitados = request.getParameterValues("servico");
-
-        Modelo modelo = new ModeloBuilder()
-                .withId(Integer.parseInt(request.getParameter("modelo")))
-                .build();
-
-        modelo = new ModeloDAO(conexao).localizarPorId(modelo);
 
         Servico servico;
         ServicoDAO servicoDAO = new ServicoDAO(conexao);

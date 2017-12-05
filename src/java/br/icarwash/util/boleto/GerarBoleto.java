@@ -99,11 +99,11 @@ public class GerarBoleto {
         titulo.setDataDoVencimento(new Date());
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
         titulo.setAceite(EnumAceite.A);
-        titulo.setDesconto(new BigDecimal(0));
-        titulo.setDeducao(BigDecimal.ZERO);
-        titulo.setMora(BigDecimal.ZERO);
-        titulo.setAcrecimo(BigDecimal.ZERO);
-        titulo.setValorCobrado(BigDecimal.ZERO);
+//        titulo.setDesconto(new BigDecimal(0));
+//        titulo.setDeducao(BigDecimal.ZERO);
+//        titulo.setMora(BigDecimal.ZERO);
+//        titulo.setAcrecimo(BigDecimal.ZERO);
+//        titulo.setValorCobrado(BigDecimal.ZERO);
 
         /*
                  * INFORMANDO OS DADOS SOBRE O BOLETO.

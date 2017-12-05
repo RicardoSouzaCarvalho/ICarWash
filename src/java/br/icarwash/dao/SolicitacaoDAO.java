@@ -56,9 +56,8 @@ public class SolicitacaoDAO {
         this.conexao = connection;
     }
 
-    public int cadastrar(Solicitacao solicitacao) {
+    public Solicitacao cadastrar(Solicitacao solicitacao) {
         Timestamp timestamp = new Timestamp(solicitacao.getDataSolicitacao().getTimeInMillis());
-        int idSolicitacao = 0;
         try {
             PreparedStatement pstmt = conexao.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
 
@@ -71,13 +70,13 @@ public class SolicitacaoDAO {
 
             final ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
-                idSolicitacao = rs.getInt(1);
+                solicitacao.setId(rs.getInt(1));
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return idSolicitacao;
+        return solicitacao;
     }
 
     public ArrayList<Solicitacao> listarSolicitacaoPorIDCliente(Solicitacao solicitacao) {
